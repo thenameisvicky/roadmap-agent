@@ -13,19 +13,12 @@ export class ModelManager {
   private readonly base_url: string|undefined;
 
   constructor() {
-    this.provider = process.env.LLM_PROVIDER 
-    this.token = process.env.LLM_API_KEY
-    this.base_url = process.env.LLM_BASE_URL
+    this.provider = process.env.LLM_PROVIDER;
+    this.token = process.env.LLM_API_KEY;
+    this.base_url = process.env.LLM_BASE_URL;
   }
 
   public async call_llm(context: Context): Promise<toolResponse> {
-    const isTest = process.env.NODE_ENV === "test" || !!process.env.VITEST;
-    const hasExplicitApiKey = !!process.env.GROQ_API_KEY;
-
-    if (isTest && !hasExplicitApiKey) {
-      return this.call_mock_llm(context);
-    }
-
     try {
       return await this.call_real_llm(context, false);
     } catch (error) {
@@ -34,15 +27,24 @@ export class ModelManager {
         return await this.call_real_llm(context, true);
       } catch (retryError) {
         console.error("LLM retry failed. Returning deterministic fallback response.", retryError);
-        return this.getFallbackResponse(context);
+        return {
+          type: "finish",
+          tool: "finish",
+          args: {
+            message: "Unable to process the request due to LLM connectivity issues."
+          }
+        };
       }
     }
   }
 
   private async call_real_llm(context: Context, strict: boolean): Promise<toolResponse> {
     const token = this.token;
+    if (!token) {
+      throw new Error("LLM_API_KEY environment variable is not defined");
+    }
     const model = process.env.LLM_MODEL || "llama-3.3-70b-versatile";
-    const url = `${this.base_url}/chat/completions`;
+    const url = `${this.base_url || "https://api.groq.com/openai/v1"}/chat/completions`;
 
     let systemInstruction = context.messages.find(m => m.role === "system")?.content || "";
     
@@ -113,83 +115,5 @@ For the final response:
     }
 
     return validationResult.data as toolResponse;
-  }
-
-  private call_mock_llm(context: Context): toolResponse {
-    const userQuery = context.messages.find(m => m.role === "user")?.content.toLowerCase() || "";
-    const toolObservationCount = context.trace.context_included.filter(item => 
-      item.startsWith("Tool Observation:")
-    ).length;
-
-    let isSdeQuery = userQuery.includes("sde") || userQuery.includes("software");
-
-    if (toolObservationCount === 0) {
-      return {
-        type: "tool",
-        tool: "get_user_profile",
-        args: {},
-      };
-    } else if (toolObservationCount === 1) {
-      const roadmapId = isSdeQuery ? "rdmp_sde2026" : "rdmp_9f2a";
-      return {
-        type: "tool",
-        tool: "get_roadmap",
-        args: { roadmap_id: roadmapId },
-      };
-    } else if (toolObservationCount === 2) {
-      const q = isSdeQuery ? "SDE month 2" : "MLOps month 4";
-      return {
-        type: "tool",
-        tool: "search_kb",
-        args: { query: q },
-      };
-    } else if (toolObservationCount === 3) {
-      const roadmapId = isSdeQuery ? "rdmp_sde2026" : "rdmp_9f2a";
-      const month = isSdeQuery ? 2 : 4;
-      const title = isSdeQuery ? "Advanced System Design" : "Model tuning & ensembles";
-      const activities = isSdeQuery ? ["Distributed Systems", "Load Balancing", "Caching"] : ["feature_engineering", "random_forests", "gradient_boosting", "capstone_week_1", "MLOps"];
-      return {
-        type: "tool",
-        tool: "update_roadmap_month",
-        args: {
-          roadmap_id: roadmapId,
-          month,
-          title,
-          activities,
-          confirmed: false,
-        },
-      };
-    } else if (toolObservationCount === 4) {
-      const roadmapId = isSdeQuery ? "rdmp_sde2026" : "rdmp_9f2a";
-      const month = isSdeQuery ? 2 : 4;
-      const title = isSdeQuery ? "Advanced System Design" : "Model tuning & ensembles";
-      const activities = isSdeQuery ? ["Distributed Systems", "Load Balancing", "Caching"] : ["feature_engineering", "random_forests", "gradient_boosting", "capstone_week_1", "MLOps"];
-      return {
-        type: "tool",
-        tool: "update_roadmap_month",
-        args: {
-          roadmap_id: roadmapId,
-          month,
-          title,
-          activities,
-          confirmed: true,
-        },
-      };
-    } else {
-      const roadmapSlug = isSdeQuery ? "priya-sde-2026" : "priya-ds-2026";
-      const monthStr = isSdeQuery ? "month 2" : "month 4";
-      const topic = isSdeQuery ? "System Design" : "MLOps";
-      return {
-        type: "finish",
-        tool: "finish",
-        args: {
-          message: `Successfully added ${topic} to ${monthStr} and saved your roadmap (${roadmapSlug}).`,
-        },
-      };
-    }
-  }
-
-  private getFallbackResponse(context: Context): toolResponse {
-    return this.call_mock_llm(context);
   }
 }

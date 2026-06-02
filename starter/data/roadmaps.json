@@ -124,7 +124,8 @@
         "activities": [
           "vector_databases",
           "langchain_alternatives",
-          "react_agent_patterns"
+          "react_agent_patterns",
+          "Express Framework"
         ]
       },
       {
@@ -150,6 +151,90 @@
       {
         "at": "2026-02-01",
         "note": "Initial create"
+      },
+      {
+        "at": "2026-06-02",
+        "note": "Updated month 4 activities"
+      },
+      {
+        "at": "2026-06-02",
+        "note": "Updated month 4 activities"
+      }
+    ]
+  },
+  {
+    "id": "rdmp_cyber2028",
+    "slug": "ash-cyber-2028",
+    "title": "6-month Cybersecurity Path",
+    "months": [
+      {
+        "month": 1,
+        "title": "Introduction to Security & Networking",
+        "activities": [
+          "networking_fundamentals",
+          "security_basics",
+          "threat_landscape"
+        ]
+      },
+      {
+        "month": 2,
+        "title": "Linux & Cryptography",
+        "activities": [
+          "linux_admin",
+          "symmetric_encryption",
+          "pki_certificates"
+        ]
+      },
+      {
+        "month": 3,
+        "title": "Ethical Hacking & Penetration Testing",
+        "activities": [
+          "footprinting",
+          "scanning_networks",
+          "vulnerability_assessment",
+          "Kali Linux Labs"
+        ]
+      },
+      {
+        "month": 4,
+        "title": "Network Defense & Incident Response",
+        "activities": [
+          "firewalls_ids",
+          "siem_analysis",
+          "forensics_basics"
+        ]
+      },
+      {
+        "month": 5,
+        "title": "Identity Management & Cloud Security",
+        "activities": [
+          "iam_protocols",
+          "cloud_security_basics",
+          "zero_trust_architecture"
+        ]
+      },
+      {
+        "month": 6,
+        "title": "Security Compliance & Capstone",
+        "activities": [
+          "iso27001_soc2",
+          "risk_management",
+          "final_audit_project"
+        ]
+      }
+    ],
+    "revision_history": [
+      {
+        "at": "2026-02-01",
+        "note": "Initial create"
+      },
+      {
+        "at": "2026-06-02",
+        "note": "Updated month 3 activities"
+      },
+      {
+        "at": "2026-06-02",
+        "note": "Updated month 3 activities"
       }
     ]
   }

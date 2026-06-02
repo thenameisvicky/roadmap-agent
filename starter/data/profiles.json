@@ -14,5 +14,13 @@
     "active_roadmap_id": "rdmp_aie2027",
     "roadmap_slug": "vicky-aie-2027",
     "graduation_year": 2027
+  },
+  {
+    "user_id": "usr_7720",
+    "name": "Ash",
+    "goal_track": "cybersecurity",
+    "active_roadmap_id": "rdmp_cyber2028",
+    "roadmap_slug": "ash-cyber-2028",
+    "graduation_year": 2028
   }
 ]
