@@ -38,8 +38,7 @@
           "feature_engineering",
           "random_forests",
           "gradient_boosting",
-          "capstone_week_1",
-          "MLOps"
+          "capstone_week_1"
         ]
       },
       {
@@ -67,22 +66,6 @@
       {
         "at": "2026-03-10",
         "note": "Added visualization to month 2"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
       }
     ]
   },
@@ -124,8 +107,7 @@
         "activities": [
           "vector_databases",
           "langchain_alternatives",
-          "react_agent_patterns",
-          "Express Framework"
+          "react_agent_patterns"
         ]
       },
       {
@@ -151,14 +133,6 @@
       {
         "at": "2026-02-01",
         "note": "Initial create"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
-      },
-      {
-        "at": "2026-06-02",
-        "note": "Updated month 4 activities"
       }
     ]
   },

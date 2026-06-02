@@ -1,10 +1,10 @@
-# Zyra Roadmap Copilot Agent
+# Roadmap Copilot Agent
 
 This is a dynamic, token-optimized Roadmap Copilot Agent. It uses a structured ReAct (Reasoning and Action) loop to read active user profiles, retrieve curriculum guides, search a technical knowledge base, and dynamically update user roadmap paths based on conversational requests.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 Below is the execution flow and system architecture:
 
@@ -44,12 +44,12 @@ graph TD
 
 ---
 
-## 💡 High-Level Design (HLD) in Plain Words
+## High-Level Design (HLD) in Plain Words
 
 Here is how the copilot actually works:
 
 ### 1. The Core Loop (ReAct)
-When you ask the copilot to do something (like "Add Express to month 4 and save it"), it doesn't just make a single LLM call. It enters a loop. It thinks (Reasoning) and decides to execute a tool (Action), checks the outcome, and continues until it is finished.
+When you ask the copilot to do something (like "Add Express to month 4 and save it"), it doesn't just make a single LLM call. It enters a loop. It thinks (Reasoning) and decides to execute a tool (Action), checks the outcome, and continues until it is finished/max steps reached.
 
 ### 2. Guarding the Token Budget (Context Compaction)
 LLM calls have limit budgets. If the conversation history is long (e.g. off-topic chat or massive roadmap payloads), the `ContextManager` steps in. It analyzes token counts. If the budget is exceeded, it evicts or summarizes large blocks of chat history (like long off-topic tutorial text) to ensure the system prompt and core task goals are preserved.
@@ -66,7 +66,7 @@ When modifying a roadmap:
 
 ---
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
 * **Node.js**: `v18+` or later.
@@ -94,7 +94,7 @@ npm run dev
 * Visit `http://localhost:3000` to interact with the visual web panel, select active users (Priya, Vicky, or Ash), and trigger the ReAct copilot loop!
 
 ### Testing
-We cover multiple integration scenarios offline using robust Vitest spied environments:
+Have cover multiple integration scenarios offline using robust Vitest spied environments:
 ```bash
 npm test
 ```
