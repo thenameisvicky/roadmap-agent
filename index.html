@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zyra Roadmap Copilot Interface</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --bg-surface: #10121a;
+      --bg-input: #151923;
+      --color-primary: #6366f1;
+      --color-primary-glow: rgba(99, 102, 241, 0.15);
+      --color-secondary: #a855f7;
+      --color-success: #10b981;
+      --color-success-glow: rgba(16, 185, 129, 0.15);
+      --color-error: #f43f5e;
+      --color-text: #f3f4f6;
+      --color-text-muted: #9ca3af;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--color-text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 50%;
+      height: 50%;
+      background: radial-gradient(circle, var(--color-primary-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 50%;
+      height: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      width: 100%;
+      padding: 1.5rem 2rem;
+      background: rgba(16, 18, 26, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      box-shadow: 0 0 15px var(--color-primary-glow);
+    }
+
+    .logo-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #d1d5db);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .api-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(99, 102, 241, 0.1);
+      color: #818cf8;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 2.5rem;
+      z-index: 1;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--border-color), transparent);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+    }
+
+    .card-title svg {
+      color: var(--color-primary);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      transition: var(--transition-smooth);
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    .grid-parameters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+      filter: brightness(1.1);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-muted);
+      border: 1px solid var(--border-color);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: none;
+    }
+
+    .status-success {
+      background-color: var(--color-success-glow);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      display: inline-block;
+    }
+
+    .status-error {
+      background-color: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      display: inline-block;
+    }
+
+    .code-container {
+      flex: 1;
+      position: relative;
+      background-color: #0b0c11;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 400px;
+    }
+
+    .code-header {
+      background-color: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .code-lang {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-copy:hover {
+      color: #fff;
+    }
+
+    pre {
+      flex: 1;
+      padding: 1.5rem;
+      overflow: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: #818cf8;
+      line-height: 1.6;
+    }
+
+    .placeholder-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      pointer-events: none;
+    }
+
+    .placeholder-text svg {
+      opacity: 0.3;
+      color: var(--color-text-muted);
+    }
+
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: auto;
+    }
+
+    .metric-card {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+    }
+
+    select {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+
+    select:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">Z</div>
+      <div class="logo-title">Zyra Roadmap Copilot</div>
+    </div>
+    <div class="api-badge">Endpoint: /ai/roadmap-copilot/run</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        ReAct Parameters
+      </div>
+
+      <div class="form-group">
+        <label for="selectUser">Active User Profile</label>
+        <select id="selectUser">
+          <option value="usr_8842">Priya Sharma (Data Science)</option>
+          <option value="usr_9910">Vicky B (AI Engineering)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="userMessage">User Query</label>
+        <textarea id="userMessage" placeholder="Describe the roadmap update you wish to perform...">Add MLOps to month 4 of my data science roadmap and save it.</textarea>
+      </div>
+
+      <div class="grid-parameters">
+        <div class="form-group">
+          <label for="tokenBudget">Token Budget</label>
+          <input type="number" id="tokenBudget" value="3500" min="500" max="10000" step="500">
+        </div>
+        <div class="form-group">
+          <label for="maxSteps">Max Agent Steps</label>
+          <input type="number" id="maxSteps" value="8" min="1" max="20">
+        </div>
+      </div>
+
+      <button id="btnSubmit" class="btn">
+        <span class="loader" id="submitLoader"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="btnIcon"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        <span>Execute Copilot Loop</span>
+      </button>
+    </section>
+
+    <section class="card">
+      <div class="output-header">
+        <div class="card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+          Execution Output
+        </div>
+        <div id="statusBadge" class="badge-status"></div>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <div class="code-lang">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M21 9H3"/><path d="M21 15H3"/><path d="M12 3v18"/></svg>
+            json
+          </div>
+          <button id="btnCopy" class="btn-copy" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            Copy JSON
+          </button>
+        </div>
+        
+        <div class="placeholder-text" id="placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="4"/><line x1="8" x2="8" y1="2" y2="4"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+          Enter query and run execution to view trajectories.
+        </div>
+
+        <pre id="outputPre"></pre>
+      </div>
+
+      <div class="metrics-strip">
+        <div class="metric-card">
+          <span class="metric-label">Status</span>
+          <span class="metric-value" id="valSuccess">—</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Total Steps</span>
+          <span class="metric-value" id="valSteps">—</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Roadmap Slug</span>
+          <span class="metric-value" id="valSlug">—</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const userMessageInput = document.getElementById('userMessage');
+    const tokenBudgetInput = document.getElementById('tokenBudget');
+    const maxStepsInput = document.getElementById('maxSteps');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const submitLoader = document.getElementById('submitLoader');
+    const btnIcon = document.getElementById('btnIcon');
+    const placeholder = document.getElementById('placeholder');
+    const outputPre = document.getElementById('outputPre');
+    const statusBadge = document.getElementById('statusBadge');
+    const btnCopy = document.getElementById('btnCopy');
+
+    const valSuccess = document.getElementById('valSuccess');
+    const valSteps = document.getElementById('valSteps');
+    const valSlug = document.getElementById('valSlug');
+
+    let currentResponseData = null;
+
+    btnSubmit.addEventListener('click', async () => {
+      btnSubmit.disabled = true;
+      submitLoader.style.display = 'block';
+      btnIcon.style.display = 'none';
+      placeholder.style.display = 'none';
+      outputPre.textContent = '';
+      statusBadge.style.display = 'none';
+      btnCopy.disabled = true;
+
+      valSuccess.textContent = '...';
+      valSteps.textContent = '...';
+      valSlug.textContent = '...';
+
+      const payload = {
+        user_message: userMessageInput.value,
+        user_id: document.getElementById('selectUser').value,
+        token_budget_per_model_call: parseInt(tokenBudgetInput.value, 10),
+        max_steps: parseInt(maxStepsInput.value, 10),
+        session_history: [
+          { role: "user", content: "Help me build a data science roadmap.", estimated_tokens: 30 },
+          { role: "assistant", content: "I'll use your profile and create a six-month plan.", estimated_tokens: 40 },
+          { role: "user", content: "What is transfer learning?", estimated_tokens: 25 },
+          { role: "assistant", content: "Transfer learning is a machine learning technique where a model developed for one task is reused... (Long off-topic tutorial text)", estimated_tokens: 480 },
+          { role: "user", content: "Show me month 3 topics.", estimated_tokens: 35 },
+          { role: "assistant", content: "Month 3 covers regression, classification, and model evaluation.", estimated_tokens: 90 }
+        ]
+      };
+
+      try {
+        const response = await fetch('/ai/roadmap-copilot/run', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        currentResponseData = data;
+
+        outputPre.textContent = JSON.stringify(data, null, 2);
+        
+        statusBadge.style.display = 'inline-block';
+        if (data.success) {
+          statusBadge.className = 'badge-status status-success';
+          statusBadge.textContent = 'Success';
+          valSuccess.textContent = 'Success';
+          valSuccess.style.color = '#34d399';
+        } else {
+          statusBadge.className = 'badge-status status-error';
+          statusBadge.textContent = 'Error';
+          valSuccess.textContent = 'Failed';
+          valSuccess.style.color = '#fb7185';
+        }
+
+        valSteps.textContent = data.steps ? data.steps.length : '0';
+        valSlug.textContent = data.slug || '—';
+        btnCopy.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        outputPre.textContent = JSON.stringify({
+          success: false,
+          error: "Failed to connect to backend server / network error.",
+          details: err.message
+        }, null, 2);
+
+        statusBadge.style.display = 'inline-block';
+        statusBadge.className = 'badge-status status-error';
+        statusBadge.textContent = 'Network Error';
+        
+        valSuccess.textContent = 'Network Err';
+        valSuccess.style.color = '#fb7185';
+        valSteps.textContent = '—';
+        valSlug.textContent = '—';
+      } finally {
+        btnSubmit.disabled = false;
+        submitLoader.style.display = 'none';
+        btnIcon.style.display = 'block';
+      }
+    });
+
+    btnCopy.addEventListener('click', () => {
+      if (!currentResponseData) return;
+      
+      navigator.clipboard.writeText(JSON.stringify(currentResponseData, null, 2))
+        .then(() => {
+          const originalText = btnCopy.innerHTML;
+          btnCopy.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span style="color: #34d399;">Copied!</span>
+          `;
+          setTimeout(() => {
+            btnCopy.innerHTML = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error("Failed to copy clipboard", err);
+        });
+    });
+  </script>
+</body>
+</html>

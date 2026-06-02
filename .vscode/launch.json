@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Build & launch",
+      "program": "${workspaceFolder}/dist/index.js",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "env": {
+        "PORT": "3000",
+        "LLM_PROVIDER": "",
+        "LLM_API_KEY": "",
+        "LLM_BASE_URL": "",
+        "LLM_MODEL": "",
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

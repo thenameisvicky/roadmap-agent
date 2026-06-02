@@ -1,0 +1,18 @@
+[
+  {
+    "user_id": "usr_8842",
+    "name": "Priya Sharma",
+    "goal_track": "data_science",
+    "active_roadmap_id": "rdmp_9f2a",
+    "roadmap_slug": "priya-ds-2026",
+    "graduation_year": 2027
+  },
+  {
+    "user_id": "usr_9910",
+    "name": "Vicky B",
+    "goal_track": "ai_engineering",
+    "active_roadmap_id": "rdmp_aie2027",
+    "roadmap_slug": "vicky-aie-2027",
+    "graduation_year": 2027
+  }
+]
