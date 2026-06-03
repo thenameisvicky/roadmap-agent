@@ -155,4 +155,4 @@ Roughly 6-7 hours were spent on implementation, testing, debugging, and document
 
 ## Hardest Tradeoffs
 
-The hardest tradeoff was to build a dynamic ReAct, JSON based workflow engine instead of deterministic hardcoded ReAct loop. I built hardcoded ReAct loop under very little time.
+The hardest tradeoff was building a dynamic ReAct JSON executor instead of hardcoding the workflow. Hardcoding profile → roadmap → update → finish would have been much simpler, but it wouldn't be a real agent. Going dynamic made the system more flexible, but I had to handle invalid tool calls, validation, retries, guardrails, and fallback logic.
