@@ -83,14 +83,29 @@ For the final response:
       response_format: { type: "json_object" }
     };
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    });
+    const timeoutMs = parseInt(process.env.LLM_TIMEOUT_MS || "30000", 10);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    let response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+    } catch (fetchErr: any) {
+      if (fetchErr.name === "AbortError") {
+        throw new Error("LLM request timed out");
+      }
+      throw fetchErr;
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       throw new Error(`Groq API completions error: ${response.statusText} (${response.status})`);

@@ -93,3 +93,50 @@ export function validateLlmResponse(data: unknown) {
 
   return { success: true as const, data: result.data };
 }
+
+export const ContextDecisionSchema = z.object({
+  reason: z.string(),
+  block: z.string(),
+});
+
+export const ContextTraceSchema = z.object({
+  step_index: z.number().int().nonnegative(),
+  tokens_used: z.number().int().nonnegative(),
+  token_budget: z.number().int().positive(),
+  context_included: z.array(z.string()),
+  context_evicted: z.array(z.string()),
+  context_decisions: z.array(ContextDecisionSchema),
+});
+
+export const StepActionSchema = z.object({
+  type: z.enum(["tool_call", "finish", "guardrail_block", "error"]),
+  tool: z.string(),
+  arguments: z.record(z.string(), z.any()),
+  result_summary: z.string(),
+});
+
+export const StepReportSchema = z.object({
+  step_index: z.number().int().nonnegative(),
+  tokens_used: z.number().int().nonnegative(),
+  token_budget: z.number().int().positive(),
+  context_included: z.array(z.string()),
+  context_evicted: z.array(z.string()),
+  context_decisions: z.array(ContextDecisionSchema),
+  action: StepActionSchema,
+});
+
+export const RunResponseSchema = z.object({
+  success: z.boolean(),
+  final_message: z.string(),
+  roadmap_updated: z.boolean(),
+  slug: z.string(),
+  steps: z.array(StepReportSchema),
+  context_trace: z.array(ContextTraceSchema),
+  provider: z.string(),
+  model: z.string(),
+});
+
+export function validateRunResponse(data: unknown) {
+  return RunResponseSchema.safeParse(data);
+}
+

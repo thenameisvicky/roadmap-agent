@@ -72,7 +72,7 @@ export async function updateRoadmapMonth(
     monthObj = { month: args.month, title: args.title, activities: args.activities };
     updatedRoadmap.months.push(monthObj);
   } else {
-    monthObj.title = args.title || monthObj.title;
+    monthObj.title = monthObj.title;
     const merged = new Set([...(monthObj.activities || []), ...(args.activities || [])]);
     monthObj.activities = Array.from(merged);
   }
@@ -97,16 +97,9 @@ export async function updateRoadmapMonth(
       roadmaps[idx] = updatedRoadmap;
       await fs.writeFile(roadmapsPath, JSON.stringify(roadmaps, null, 2), "utf-8");
     }
-  } catch {}
-
-  try {
-    const defaultRoadmapPath = path.resolve(process.cwd(), "starter/data/roadmap.json");
-    const content = await fs.readFile(defaultRoadmapPath, "utf-8");
-    const defaultRoadmap = JSON.parse(content) as Roadmap;
-    if (defaultRoadmap.id === args.roadmap_id) {
-      await fs.writeFile(defaultRoadmapPath, JSON.stringify(updatedRoadmap, null, 2), "utf-8");
-    }
-  } catch {}
+  } catch {
+    throw new Error(`Failed to update roadmap with ID ${args.roadmap_id}.`);
+  }
 
   return {
     success: true,

@@ -3,9 +3,21 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { AgentRuntime } from "./runtime/run";
 import { Userdetails } from "./schema";
-import { validateHttpRequest } from "./validator";
+import { validateHttpRequest, validateRunResponse } from "./validator";
 
 export const roadmapRouter = Router();
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMsg = "Request timeout"): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(errorMsg));
+    }, timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
+}
 
 roadmapRouter.post("/ai/roadmap-copilot/run", async (req: Request, res: Response) => {
   try {
@@ -51,7 +63,21 @@ roadmapRouter.post("/ai/roadmap-copilot/run", async (req: Request, res: Response
       session_history
     );
 
-    const result = await runtime.run();
+    const requestTimeoutMs = parseInt(process.env.REQUEST_TIMEOUT_MS || "60000", 10);
+    let result;
+    try {
+      result = await withTimeout(runtime.run(), requestTimeoutMs, "Request timeout");
+    } catch (err: any) {
+      if (err.message === "Request timeout") {
+        res.status(500).json({
+          success: false,
+          error: "Request timeout"
+        });
+        return;
+      }
+      throw err;
+    }
+
     const state = runtime.getState();
 
     const stepsReport = state.context_trace.map((trace, index) => {
@@ -104,18 +130,27 @@ roadmapRouter.post("/ai/roadmap-copilot/run", async (req: Request, res: Response
     });
 
     const runReport = {
-      scenario_id: req.body.scenario_id || "roadmap_mlops_save",
-      mode: "live",
-      provider: process.env.LLM_PROVIDER || "google",
-      model: process.env.LLM_MODEL || "gemini-2.5-flash",
       success: result.success,
       final_message: result.final_message,
       roadmap_updated: result.roadmap_updated,
       slug: result.slug,
       steps: stepsReport,
+      context_trace: state.context_trace,
+      provider: process.env.LLM_PROVIDER || "google",
+      model: process.env.LLM_MODEL || "gemini-2.5-flash",
     };
 
-    res.status(200).json(runReport);
+    const responseValidation = validateRunResponse(runReport);
+    if (!responseValidation.success) {
+      console.error("HTTP Response validation failed details:", responseValidation.error.format());
+      res.status(500).json({
+        success: false,
+        error: "Response validation failed",
+      });
+      return;
+    }
+
+    res.status(200).json(responseValidation.data);
   } catch (error: any) {
     console.error("Route execution error:", error);
     res.status(500).json({

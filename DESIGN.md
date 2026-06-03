@@ -86,7 +86,7 @@ Components:
   * Tool execution errors are returned as structured tool results.
   * The agent may choose an alternative action or terminate gracefully.
 * Timeout
-  * LLM and tool execution are protected by timeout limits.
+  * LLM calls and overall request execution are protected by timeout limits.
   * Timeout errors return structured error responses.
 * Max Step Exceeded
   * Runtime terminates execution if max_steps is reached before finish().

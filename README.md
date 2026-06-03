@@ -94,7 +94,7 @@ npm run dev
 * Visit `http://localhost:3000` to interact with the visual web panel, select active users (Priya, Vicky, or Ash), and trigger the ReAct copilot loop!
 
 ### Testing
-Have cover multiple integration scenarios offline using robust Vitest spied environments:
+We cover multiple integration scenarios offline using robust Vitest mocked/spied environments:
 ```bash
 npm test
 ```
@@ -102,3 +102,57 @@ The test suite validates:
 1. **Scenario 1**: Priya Sharma's Data Science track (MLOps addition, unconfirmed guardrails, and confirmed updates).
 2. **Scenario 2**: Vicky B's AI Engineering track (Backend/Express addition and confirmed merges).
 3. **Scenario 3**: Ash's Cybersecurity track (Knowledge base search, pentesting tool lookups, and confirmed updates).
+4. **Fallback & Retry Policies**: Handles malformed LLM responses with warnings and single retries.
+5. **Timeout Handling**: Validates system resilience under slow LLM APIs and route execution hangs.
+
+---
+
+## Environment Variables
+
+The application is configured using the following environment variables (which can be defined in a `.env` file at the project root):
+
+* `LLM_PROVIDER`: The LLM hosting platform (e.g. `groq`, `openai`).
+* `LLM_API_KEY`: API credential key for the chosen LLM provider.
+* `LLM_MODEL`: Model identifier to use (e.g. `llama-3.3-70b-versatile`, `gpt-4.1-mini`).
+* `LLM_TIMEOUT_MS`: Timeout for direct model API completion requests. Defaults to `30000`.
+* `REQUEST_TIMEOUT_MS`: Overall request timeout for the `/ai/roadmap-copilot/run` route. Defaults to `60000`.
+
+---
+
+## Validation & Checker Script
+
+The schema of the agent run trajectories is strictly validated on output. You can run the validation checker script to parse and validate the saved execution payload against the expected run response schema:
+
+```bash
+npm run check
+```
+
+This command runs `scripts/check.ts` which loads `examples/response.json`, validates it using the Zod response schema, and exits with `0` (or `1` + validation logs on errors).
+
+---
+
+## Reliability & Resiliency Strategies
+
+### Fallback Strategy
+1. **Initial LLM Call**: The agent sends the ReAct prompt and dynamic tool definitions to the LLM.
+2. **Strict Retry Prompt**: If the response is malformed or violates the schema, the system catches the error and executes a single retry call, appending a warning instructing the model to strictly follow the expected JSON schema.
+3. **Deterministic Fallback**: If the retry attempt also fails or encounters network problems, the runtime yields a hardcoded deterministic fallback action to gracefully finish the loop:
+   ```json
+   { "type": "finish", "tool": "finish", "args": { "message": "Unable to process the request due to LLM connectivity issues." } }
+   ```
+
+### Timeout Strategy
+* **LLM Timeout**: Direct chat completion requests are wrapped in an `AbortController` signal timed to `LLM_TIMEOUT_MS`. If breached, the network request is aborted, throwing a timeout error that participates in the fallback retry mechanism.
+* **Request Timeout**: The Express endpoint wraps the entire ReAct loop run. If execution takes longer than `REQUEST_TIMEOUT_MS`, the promise is rejected, and a structured `{ "success": false, "error": "Request timeout" }` payload is returned without crashing the server.
+
+---
+
+## Time Spent
+
+Roughly 6-7 hours were spent on implementation, testing, debugging, and documentation.
+
+---
+
+## Hardest Tradeoffs
+
+The hardest tradeoff was to build a dynamic ReAct, JSON based workflow engine instead of deterministic hardcoded ReAct loop. I built hardcoded ReAct loop under very little time.

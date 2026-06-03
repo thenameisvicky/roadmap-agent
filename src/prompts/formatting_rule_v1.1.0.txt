@@ -1,0 +1,17 @@
+CRITICAL: You MUST respond ONLY with a single JSON object. No other text, no markdown code block wraps (like ```json).
+Required formats:
+For a tool call:
+{
+  "type": "tool",
+  "tool": "get_user_profile" | "get_roadmap" | "search_kb" | "update_roadmap_month",
+  "args": { ... }
+}
+
+For the final response:
+{
+  "type": "finish",
+  "tool": "finish",
+  "args": {
+    "message": "User-facing summary message"
+  }
+}
